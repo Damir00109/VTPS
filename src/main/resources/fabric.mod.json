@@ -19,9 +19,6 @@
 			"com.damir00109.VanillaTPS"
 		]
 	},
-	"mixins": [
-		"vanilla-tps.mixins.json"
-	],
 	"depends": {
 		"fabricloader": ">=0.16.10",
 		"minecraft": "~1.21.4",

@@ -3,7 +3,8 @@
 	"package": "com.damir00109.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"MinecraftServerMixin",
+		"CommandManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

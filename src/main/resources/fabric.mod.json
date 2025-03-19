@@ -3,27 +3,24 @@
 	"id": "vanilla-tps",
 	"version": "${version}",
 	"name": "Vanilla+ TPS",
-	"description": "TPS!",
+	"description": "Vanilla+ TPS)))!",
 	"authors": [
 		"Damir00109!"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/Damir00109/VTPS/"
+		"homepage": "https://github.com/Damir00109/VTPS",
+		"sources": "https://github.com/Damir00109/VTPS"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/vanilla-tps/icon.png",
 	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"com.damir00109.VanillaTPS"
-		]
-	},
+	"mixins": [
+		"vanilla-tps.mixins.json"
+	],
 	"depends": {
 		"fabricloader": ">=0.16.10",
-		"minecraft": "~1.21.4",
-		"java": ">=21",
-		"fabric-api": "*"
+		"minecraft": ["~1.21.5-","1.21.4","1.21.3","1.21.2","1.21.1","1.21","1.20.6","1.20.5","1.20.4","1.20.3","1.20.2"],
+		"java": ">=21"
 	},
 	"suggests": {
 		"another-mod": "*"

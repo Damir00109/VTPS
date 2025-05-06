@@ -63,7 +63,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "${{ steps.tags.outputs.RELEASE_TAG }}"
-          name: "Vanilla+ Radio ${{ steps.version.outputs.MOD_VERSION }}"
+          name: "Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }}"
           files: build/libs/*[!-dev].jar
           draft: false
           generate_release_notes: true

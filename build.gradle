@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -18,11 +18,25 @@ repositories {
 	// for more information about repositories.
 }
 
+loom {
+	splitEnvironmentSourceSets()
+
+	mods {
+		"vanilla-tps" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
-	minecraft "net.minecraft:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	
 }
 
 processResources {

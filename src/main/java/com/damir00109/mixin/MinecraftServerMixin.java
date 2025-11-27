@@ -10,9 +10,8 @@ import com.damir00109.VanillaTPS;
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
 
-    @Inject(method = "tick", at = @At("TAIL"))
+    @Inject(method = "tickServer", at = @At("TAIL")) // tick -> tickServer
     private void onServerTick(CallbackInfo ci) {
-        // Вызываем метод из основного класса
         VanillaTPS.onServerTick((MinecraftServer) (Object) this);
     }
 }

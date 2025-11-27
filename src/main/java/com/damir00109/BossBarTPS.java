@@ -1,54 +1,48 @@
 package com.damir00109;
 
-import net.minecraft.entity.boss.ServerBossBar;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.BossEvent;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.network.chat.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class BossBarTPS {
-    private static final Map<UUID, ServerBossBar> playerBossBars = new HashMap<>();
+    private static final Map<UUID, ServerBossEvent> playerBossBars = new HashMap<>();
     private static final Map<UUID, Boolean> playerBossBarStates = new HashMap<>();
 
-    /**
-     * Включает или выключает Boss Bar для конкретного игрока.
-     */
-    public static void toggleBossBar(ServerPlayerEntity player) {
-        UUID playerId = player.getUuid();
+    public static void toggleBossBar(ServerPlayer player) {
+        UUID playerId = player.getUUID();
         boolean isEnabled = playerBossBarStates.getOrDefault(playerId, false);
 
         if (isEnabled) {
-            stopBossBarUpdates(player); // Выключаем Boss Bar
-            player.sendMessage(Text.of("TPS BossBar выключен"), false);
+            stopBossBarUpdates(player);
+            player.sendSystemMessage(Component.literal("TPS BossBar выключен"));
         } else {
-            startBossBarUpdates(player); // Включаем Boss Bar
-            player.sendMessage(Text.of("TPS BossBar включён"), false);
+            startBossBarUpdates(player);
+            player.sendSystemMessage(Component.literal("TPS BossBar включён"));
         }
 
-        playerBossBarStates.put(playerId, !isEnabled); // Обновляем состояние
+        playerBossBarStates.put(playerId, !isEnabled);
     }
 
-    /**
-     * Запускает обновление Boss Bar для игрока.
-     */
-    private static void startBossBarUpdates(ServerPlayerEntity player) {
-        ServerBossBar bossBar = new ServerBossBar(
-                Text.literal("TPS: 0.00, MSPT: 0.00ms, Ping: 0ms"),
-                ServerBossBar.Color.GREEN, // Начальный цвет
-                ServerBossBar.Style.PROGRESS
+    private static void startBossBarUpdates(ServerPlayer player) {
+        ServerBossEvent bossBar = new ServerBossEvent(
+                Component.literal("TPS: 0.00, MSPT: 0.00ms, Ping: 0ms"),
+                BossEvent.BossBarColor.GREEN,
+                BossEvent.BossBarOverlay.PROGRESS // Исправлено на BossBarOverlay
         );
 
-        bossBar.addPlayer(player); // Показываем Boss Bar игроку
-        playerBossBars.put(player.getUuid(), bossBar); // Сохраняем Boss Bar
+        bossBar.addPlayer(player);
+        playerBossBars.put(player.getUUID(), bossBar);
 
-        // Запускаем поток для обновления Boss Bar
         new Thread(() -> {
-            while (playerBossBarStates.getOrDefault(player.getUuid(), false)) {
-                updateBossBar(player); // Обновляем Boss Bar
+            while (playerBossBarStates.getOrDefault(player.getUUID(), false)) {
+                updateBossBar(player);
                 try {
-                    Thread.sleep(500); // Задержка 500 мс
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -56,46 +50,34 @@ public class BossBarTPS {
         }).start();
     }
 
-    /**
-     * Останавливает обновление Boss Bar для игрока.
-     */
-    private static void stopBossBarUpdates(ServerPlayerEntity player) {
-        ServerBossBar bossBar = playerBossBars.get(player.getUuid());
+    private static void stopBossBarUpdates(ServerPlayer player) {
+        ServerBossEvent bossBar = playerBossBars.get(player.getUUID());
         if (bossBar != null) {
-            bossBar.removePlayer(player); // Скрываем Boss Bar
-            playerBossBars.remove(player.getUuid()); // Удаляем Boss Bar
+            bossBar.removePlayer(player);
+            playerBossBars.remove(player.getUUID());
         }
     }
 
-    /**
-     * Обновляет текст и цвет Boss Bar для игрока.
-     */
-    private static void updateBossBar(ServerPlayerEntity player) {
-        ServerBossBar bossBar = playerBossBars.get(player.getUuid());
+    private static void updateBossBar(ServerPlayer player) {
+        ServerBossEvent bossBar = playerBossBars.get(player.getUUID());
         if (bossBar == null) return;
 
         double tps = VanillaTPS.getCurrentTPS();
         double mspt = VanillaTPS.getCurrentMSPT();
-        int ping = player.networkHandler.getLatency(); // Пинг игрока
+        int ping = player.connection.latency();
 
-        // Формируем текст для Boss Bar
         String message = String.format("TPS: %.2f, MSPT: %.2fms, Ping: %dms", tps, mspt, ping);
-
-        // Обновляем текст и цвет Boss Bar
-        bossBar.setName(Text.literal(message)); // Устанавливаем текст
-        bossBar.setColor(getBossBarColor(tps)); // Устанавливаем цвет
+        bossBar.setName(Component.literal(message));
+        bossBar.setColor(getBossBarColor(tps));
     }
 
-    /**
-     * Возвращает цвет Boss Bar в зависимости от значения TPS.
-     */
-    private static ServerBossBar.Color getBossBarColor(double tps) {
+    private static BossEvent.BossBarColor getBossBarColor(double tps) {
         if (tps >= 18.0) {
-            return ServerBossBar.Color.GREEN; // Всё хорошо
+            return BossEvent.BossBarColor.GREEN;
         } else if (tps >= 15.0) {
-            return ServerBossBar.Color.YELLOW; // Средняя нагрузка
+            return BossEvent.BossBarColor.YELLOW;
         } else {
-            return ServerBossBar.Color.RED; // Высокая нагрузка
+            return BossEvent.BossBarColor.RED;
         }
     }
 }

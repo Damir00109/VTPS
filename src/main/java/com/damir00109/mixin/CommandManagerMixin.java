@@ -1,9 +1,9 @@
 package com.damir00109.mixin;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -13,15 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.damir00109.VanillaTPS;
 
-@Mixin(CommandManager.class)
+@Mixin(Commands.class) // Исправлено на Commands
 public abstract class CommandManagerMixin {
     @Shadow
     @Final
-    private CommandDispatcher<ServerCommandSource> dispatcher;
+    private CommandDispatcher<CommandSourceStack> dispatcher;
 
-    /**
-     * Перехватываем момент регистрации команд.
-     */
     @Inject(
             at = @At(
                     value = "INVOKE",
@@ -30,8 +27,7 @@ public abstract class CommandManagerMixin {
             ),
             method = "<init>"
     )
-    private void registerCommands(CommandManager.RegistrationEnvironment environment, CommandRegistryAccess registryAccess, CallbackInfo ci) {
-        // Регистрируем команды из VanillaTPS
+    private void registerCommands(Commands.CommandSelection environment, CommandBuildContext registryAccess, CallbackInfo ci) {
         VanillaTPS.registerCommands(this.dispatcher);
     }
 }

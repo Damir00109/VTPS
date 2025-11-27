@@ -1,163 +1,156 @@
 package com.damir00109;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.lang.management.ManagementFactory;
 import java.util.ArrayDeque;
 import java.util.Queue;
+
 import com.mojang.brigadier.CommandDispatcher;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class VanillaTPS {
-	public static final String MOD_ID = "vanilla-tps";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    public static final String MOD_ID = "vanilla-tps";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-	// Общие поля (теперь public)
-	public static long lastTickTime = 0;
-	public static double tps = 20.0;
-	public static double mspt = 50.0;
-	public static final Queue<Double> tps5s = new ArrayDeque<>(100);
-	public static final Queue<Double> tps1m = new ArrayDeque<>(1200);
-	public static final Queue<Double> tps5m = new ArrayDeque<>(6000);
-	public static final Queue<Double> tps15m = new ArrayDeque<>(18000);
-	public static final Queue<Double> mspt5s = new ArrayDeque<>(100);
-	public static final Queue<Double> mspt1m = new ArrayDeque<>(1200);
-	public static final Queue<Double> mspt5m = new ArrayDeque<>(6000);
-	public static final Queue<Double> mspt15m = new ArrayDeque<>(18000);
+    // Общие поля (остаются без изменений)
+    public static long lastTickTime = 0;
+    public static double tps = 20.0;
+    public static double mspt = 50.0;
 
-	/**
-	 * Метод для обработки серверных тиков.
-	 */
-	public static void onServerTick(MinecraftServer server) {
-		long currentTime = System.nanoTime();
-		if (lastTickTime != 0) {
-			double deltaTime = (currentTime - lastTickTime) / 1_000_000_000.0;
-			tps = 1.0 / deltaTime;
-			mspt = deltaTime * 1000;
+    public static final Queue<Double> tps5s = new ArrayDeque<>(100);
+    public static final Queue<Double> tps1m = new ArrayDeque<>(1200);
+    public static final Queue<Double> tps5m = new ArrayDeque<>(6000);
+    public static final Queue<Double> tps15m = new ArrayDeque<>(18000);
 
-			collectStatistics(tps, mspt);
-		}
-		lastTickTime = currentTime;
-	}
+    public static final Queue<Double> mspt5s = new ArrayDeque<>(100);
+    public static final Queue<Double> mspt1m = new ArrayDeque<>(1200);
+    public static final Queue<Double> mspt5m = new ArrayDeque<>(6000);
+    public static final Queue<Double> mspt15m = new ArrayDeque<>(18000);
 
-	/**
-	 * Метод для сбора статистики TPS и MSPT.
-	 */
-	private static void collectStatistics(double tps, double mspt) {
-		tps5s.add(tps);
-		tps1m.add(tps);
-		tps5m.add(tps);
-		tps15m.add(tps);
+    public static void onServerTick(MinecraftServer server) {
+        long currentTime = System.nanoTime();
 
-		mspt5s.add(mspt);
-		mspt1m.add(mspt);
-		mspt5m.add(mspt);
-		mspt15m.add(mspt);
+        if (lastTickTime != 0) {
+            double deltaTime = (currentTime - lastTickTime) / 1_000_000_000.0;
+            tps = 1.0 / deltaTime;
+            mspt = deltaTime * 1000;
 
-		if (tps5s.size() > 100) tps5s.poll();
-		if (tps1m.size() > 1200) tps1m.poll();
-		if (tps5m.size() > 6000) tps5m.poll();
-		if (tps15m.size() > 18000) tps15m.poll();
+            collectStatistics(tps, mspt);
+        }
 
-		if (mspt5s.size() > 100) mspt5s.poll();
-		if (mspt1m.size() > 1200) mspt1m.poll();
-		if (mspt5m.size() > 6000) mspt5m.poll();
-		if (mspt15m.size() > 18000) mspt15m.poll();
-	}
+        lastTickTime = currentTime;
+    }
 
-	/**
-	 * Возвращает текущее значение TPS.
-	 */
-	public static double getCurrentTPS() {
-		return tps;
-	}
+    private static void collectStatistics(double tps, double mspt) {
+        // Код без изменений
+        tps5s.add(tps);
+        tps1m.add(tps);
+        tps5m.add(tps);
+        tps15m.add(tps);
 
-	/**
-	 * Возвращает текущее значение MSPT.
-	 */
-	public static double getCurrentMSPT() {
-		return mspt;
-	}
+        mspt5s.add(mspt);
+        mspt1m.add(mspt);
+        mspt5m.add(mspt);
+        mspt15m.add(mspt);
 
-	/**
-	 * Метод для получения информации о CPU.
-	 */
-	public static double getCpuUsage() {
-		com.sun.management.OperatingSystemMXBean osBean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-		double processLoad = osBean.getProcessCpuLoad() * 100;
-		return Double.isNaN(processLoad) ? 0 : processLoad;
-	}
+        if (tps5s.size() > 100) tps5s.poll();
+        if (tps1m.size() > 1200) tps1m.poll();
+        if (tps5m.size() > 6000) tps5m.poll();
+        if (tps15m.size() > 18000) tps15m.poll();
 
-	/**
-	 * Метод для получения информации о RAM в процентах.
-	 */
-	public static double getRamUsagePercentage() {
-		Runtime runtime = Runtime.getRuntime();
-		long totalMemory = runtime.totalMemory();
-		long freeMemory = runtime.freeMemory();
-		long usedMemory = totalMemory - freeMemory;
-		long maxMemory = runtime.maxMemory();
-		return (double) usedMemory / maxMemory * 100;
-	}
+        if (mspt5s.size() > 100) mspt5s.poll();
+        if (mspt1m.size() > 1200) mspt1m.poll();
+        if (mspt5m.size() > 6000) mspt5m.poll();
+        if (mspt15m.size() > 18000) mspt15m.poll();
+    }
 
-	/**
-	 * Метод для получения информации о RAM в формате "Использовано: XM / YM (max: ZM)".
-	 */
-	public static String getRamUsageFormatted() {
-		Runtime runtime = Runtime.getRuntime();
-		long totalMemory = runtime.totalMemory();
-		long freeMemory = runtime.freeMemory();
-		long usedMemory = totalMemory - freeMemory;
-		long maxMemory = runtime.maxMemory();
-		return String.format("%dM / %dM (max: %dM)",
-				usedMemory / 1024 / 1024,
-				totalMemory / 1024 / 1024,
-				maxMemory / 1024 / 1024);
-	}
+    public static double getCurrentTPS() {
+        return tps;
+    }
 
-	/**
-	 * Метод для регистрации команд.
-	 */
-	public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
-		// Команда /tps
-		dispatcher.register(
-				literal("tps")
-						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
-						.executes(context -> {
-							context.getSource().sendMessage(Text.of(TPS.getTpsInfo()));
-							return 1;
-						})
-		);
+    public static double getCurrentMSPT() {
+        return mspt;
+    }
 
-		// Команда /tps-actionbar
-		dispatcher.register(
-				literal("tps-actionbar")
-						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
-						.executes(context -> {
-							ServerPlayerEntity player = context.getSource().getPlayer();
-							if (player != null) {
-								ActionBar.toggleActionBar(player);
-							}
-							return 1;
-						})
-		);
+    public static double getCpuUsage() {
+        com.sun.management.OperatingSystemMXBean osBean =
+                (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
-		// Команда /tabtps
-		dispatcher.register(
-				literal("tabtps")
-						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
-						.executes(context -> {
-							ServerPlayerEntity player = context.getSource().getPlayer();
-							if (player != null) {
-								BossBarTPS.toggleBossBar(player);
-							}
-							return 1;
-						})
-		);
-	}
+        double load = osBean.getProcessCpuLoad() * 100;
+        return Double.isNaN(load) ? 0 : load;
+    }
+
+    public static double getRamUsagePercentage() {
+        Runtime runtime = Runtime.getRuntime();
+        long total = runtime.totalMemory();
+        long free = runtime.freeMemory();
+        long used = total - free;
+        long max = runtime.maxMemory();
+        return (double) used / max * 100;
+    }
+
+    public static String getRamUsageFormatted() {
+        Runtime runtime = Runtime.getRuntime();
+        long total = runtime.totalMemory();
+        long free = runtime.freeMemory();
+        long used = total - free;
+        long max = runtime.maxMemory();
+
+        return String.format("%dM / %dM (max: %dM)",
+                used / 1024 / 1024,
+                total / 1024 / 1024,
+                max / 1024 / 1024
+        );
+    }
+
+    private static boolean isOp(CommandSourceStack source) {
+        ServerPlayer player = source.getPlayer();
+        if (player == null) return false;
+
+        // Используем прямой вызов как в оригинальном коде Minecraft
+        return source.getServer()
+                .getPlayerList()
+                .isOp(player.nameAndId());
+    }
+
+    public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
+        // /tps
+        dispatcher.register(
+                literal("tps")
+                        .requires(VanillaTPS::isOp)
+                        .executes(ctx -> {
+                            ctx.getSource().sendSystemMessage(Component.literal(TPS.getTpsInfo()));
+                            return 1;
+                        })
+        );
+
+        // /tps-actionbar
+        dispatcher.register(
+                literal("tps-actionbar")
+                        .requires(VanillaTPS::isOp)
+                        .executes(ctx -> {
+                            ServerPlayer p = ctx.getSource().getPlayer();
+                            if (p != null) ActionBar.toggleActionBar(p);
+                            return 1;
+                        })
+        );
+
+        // /tabtps
+        dispatcher.register(
+                literal("tabtps")
+                        .requires(VanillaTPS::isOp)
+                        .executes(ctx -> {
+                            ServerPlayer p = ctx.getSource().getPlayer();
+                            if (p != null) BossBarTPS.toggleBossBar(p);
+                            return 1;
+                        })
+        );
+    }
 }

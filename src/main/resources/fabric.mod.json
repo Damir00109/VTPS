@@ -5,21 +5,25 @@
 	"name": "Vanilla+ TPS",
 	"description": "Vanilla+ TPS)))!",
 	"authors": [
-		"Damir00109!"
+		"Damir00109"
 	],
 	"contact": {
-		"homepage": "https://github.com/Damir00109/VTPS",
-		"sources": "https://github.com/Damir00109/VTPS"
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/vanilla-tps/icon.png",
 	"environment": "*",
 	"mixins": [
-		"vanilla-tps.mixins.json"
+		"vanilla-tps.mixins.json",
+		{
+			"config": "vanilla-tps.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"depends": {
-		"fabricloader": ">=0.16.10",
-		"minecraft": "*",
+		"fabricloader": ">=0.18.1",
+		"minecraft": "~1.21.11-",
 		"java": ">=21"
 	},
 	"suggests": {

@@ -4,6 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,10 +20,10 @@ public class BossBarTPS {
 
         if (isEnabled) {
             stopBossBarUpdates(player);
-            player.sendSystemMessage(Component.literal("TPS BossBar выключен"));
+            player.sendSystemMessage(Component.literal("BossBar TPS ").append(Component.literal("выключен").withStyle(ChatFormatting.RED)));
         } else {
             startBossBarUpdates(player);
-            player.sendSystemMessage(Component.literal("TPS BossBar включён"));
+            player.sendSystemMessage(Component.literal("BossBar TPS ").append(Component.literal("включен").withStyle(ChatFormatting.GREEN)));
         }
 
         playerBossBarStates.put(playerId, !isEnabled);
@@ -30,6 +31,7 @@ public class BossBarTPS {
 
     private static void startBossBarUpdates(ServerPlayer player) {
         ServerBossEvent bossBar = new ServerBossEvent(
+                player.getUUID(),
                 Component.literal("TPS: 0.00, MSPT: 0.00ms, Ping: 0ms"),
                 BossEvent.BossBarColor.GREEN,
                 BossEvent.BossBarOverlay.PROGRESS // Исправлено на BossBarOverlay
@@ -62,8 +64,8 @@ public class BossBarTPS {
         ServerBossEvent bossBar = playerBossBars.get(player.getUUID());
         if (bossBar == null) return;
 
-        double tps = VanillaTPS.getCurrentTPS();
-        double mspt = VanillaTPS.getCurrentMSPT();
+        double tps = VTPS.getCurrentTPS();
+        double mspt = VTPS.getCurrentMSPT();
         int ping = player.connection.latency();
 
         String message = String.format("TPS: %.2f, MSPT: %.2fms, Ping: %dms", tps, mspt, ping);

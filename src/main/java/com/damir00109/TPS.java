@@ -12,10 +12,10 @@ public class TPS {
                 .append(String.format("%-20s", "Ресурсы:"))
                 .append("\n");
 
-        double tps5s = getAverage(VanillaTPS.tps5s);
-        double tps1m = getAverage(VanillaTPS.tps1m);
-        double tps5m = getAverage(VanillaTPS.tps5m);
-        double tps15m = getAverage(VanillaTPS.tps15m);
+        double tps5s = getAverage(VTPS.tps5s);
+        double tps1m = getAverage(VTPS.tps1m);
+        double tps5m = getAverage(VTPS.tps5m);
+        double tps15m = getAverage(VTPS.tps15m);
 
         String s5 = String.format("%.2f", tps5s);
         String s1 = String.format("%.2f", tps1m);
@@ -25,20 +25,20 @@ public class TPS {
         int max = Math.max(Math.max(s5.length(), s1.length()), Math.max(s5m.length(), s15.length()));
 
         builder.append("├─ 5s: ").append(String.format("%-" + max + "s", s5))
-                .append("   ├─ 5s: ").append(String.format("%-10.2f", getAverage(VanillaTPS.mspt5s)))
-                .append("   CPU: ").append(String.format("%.2f%%", VanillaTPS.getCpuUsage())).append("\n");
+                .append("   ├─ 5s: ").append(String.format("%-10.2f", getAverage(VTPS.mspt5s)))
+                .append("   CPU: ").append(String.format("%.2f%%", VTPS.getCpuUsage())).append("\n");
 
         builder.append("├─ 1m: ").append(String.format("%-" + max + "s", s1))
-                .append("   ├─ 1m: ").append(String.format("%-10.2f", getAverage(VanillaTPS.mspt1m)))
-                .append("   RAM: ").append(String.format("%.2f%%", VanillaTPS.getRamUsagePercentage())).append("\n");
+                .append("   ├─ 1m: ").append(String.format("%-10.2f", getAverage(VTPS.mspt1m)))
+                .append("   RAM: ").append(String.format("%.2f%%", VTPS.getRamUsagePercentage())).append("\n");
 
         builder.append("├─ 5m: ").append(String.format("%-" + max + "s", s5m))
-                .append("   ├─ 5m: ").append(String.format("%-10.2f", getAverage(VanillaTPS.mspt5m))).append("\n");
+                .append("   ├─ 5m: ").append(String.format("%-10.2f", getAverage(VTPS.mspt5m))).append("\n");
 
         builder.append("└─ 15m: ").append(String.format("%-" + max + "s", s15))
-                .append("  └─ 15m: ").append(String.format("%-10.2f", getAverage(VanillaTPS.mspt15m))).append("\n");
+                .append("  └─ 15m: ").append(String.format("%-10.2f", getAverage(VTPS.mspt15m))).append("\n");
 
-        builder.append("\nИспользовано: ").append(VanillaTPS.getRamUsageFormatted()).append("\n");
+        builder.append("\nИспользовано: ").append(VTPS.getRamUsageFormatted()).append("\n");
 
         return builder.toString();
     }

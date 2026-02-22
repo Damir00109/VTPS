@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "vanilla-tps",
+	"id": "vtps",
 	"version": "${version}",
-	"name": "Vanilla+ TPS",
-	"description": "Vanilla+ TPS)))!",
+	"name": "VTPS",
+	"description": "Lightweight standalone TPS monitor for Minecraft. Works without any dependencies on any Minecraft version. Real-time server performance monitoring with multilingual support.",
 	"authors": [
 		"Damir00109"
 	],
@@ -12,21 +12,19 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/vanilla-tps/icon.png",
+	"icon": "assets/vtps/icon.png",
 	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.damir00109.VTPS"
+		]
+	},
 	"mixins": [
-		"vanilla-tps.mixins.json",
-		{
-			"config": "vanilla-tps.client.mixins.json",
-			"environment": "client"
-		}
+		"vtps.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.18.1",
-		"minecraft": "~1.21.11-",
-		"java": ">=21"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~26.1-",
+		"java": ">=25"
 	}
 }

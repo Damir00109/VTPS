@@ -2,6 +2,7 @@ package com.damir00109;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,10 +21,10 @@ public class ActionBar {
 
         if (isEnabled) {
             stopActionBarUpdates(player);
-            player.sendSystemMessage(Component.literal("TPS ActionBar выключен")); // sendMessage -> sendSystemMessage, Text -> Component
+            player.sendSystemMessage(Component.literal("ActionBar TPS ").append(Component.literal("выключен").withStyle(ChatFormatting.RED)));
         } else {
             startActionBarUpdates(player);
-            player.sendSystemMessage(Component.literal("TPS ActionBar включён"));
+            player.sendSystemMessage(Component.literal("ActionBar TPS ").append(Component.literal("включен").withStyle(ChatFormatting.GREEN)));
         }
 
         playerActionBarStates.put(playerId, !isEnabled);
@@ -47,8 +48,8 @@ public class ActionBar {
     }
 
     public static void updateActionBar(ServerPlayer player) { // ServerPlayerEntity -> ServerPlayer
-        double tps = VanillaTPS.getCurrentTPS();
-        double mspt = VanillaTPS.getCurrentMSPT();
+        double tps = VTPS.getCurrentTPS();
+        double mspt = VTPS.getCurrentMSPT();
         int ping = player.connection.latency(); // networkHandler.getLatency() -> connection.latency()
 
         String message = String.format("TPS: %.2f, MSPT: %.2fms, Ping: %dms", tps, mspt, ping);

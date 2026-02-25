@@ -2,7 +2,7 @@ name: Build Vanilla+ TPS
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, 1.20.2-1.21.10]
 
 permissions:
   contents: write
@@ -63,7 +63,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "${{ steps.tags.outputs.RELEASE_TAG }}"
-          name: "Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }}"
+          name: "Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }} Minecraft: 1.20.2-1.21.10"
           files: build/libs/*[!-dev].jar
           draft: false
           generate_release_notes: true

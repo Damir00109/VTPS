@@ -63,8 +63,8 @@ public class ActionBar {
      * Обновляет текст Action Bar для игрока.
      */
     public static void updateActionBar(ServerPlayerEntity player) {
-        double tps = VanillaTPS.getCurrentTPS();
-        double mspt = VanillaTPS.getCurrentMSPT();
+        double tps = VTPS.getCurrentTPS();
+        double mspt = VTPS.getCurrentMSPT();
         int ping = player.networkHandler.getLatency(); // Пинг игрока
 
         // Формируем текст для Action Bar

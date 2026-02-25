@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.damir00109.VanillaTPS;
+import com.damir00109.VTPS;
 
 @Mixin(CommandManager.class)
 public abstract class CommandManagerMixin {
@@ -32,6 +32,6 @@ public abstract class CommandManagerMixin {
     )
     private void registerCommands(CommandManager.RegistrationEnvironment environment, CommandRegistryAccess registryAccess, CallbackInfo ci) {
         // Регистрируем команды из VanillaTPS
-        VanillaTPS.registerCommands(this.dispatcher);
+        VTPS.registerCommands(this.dispatcher);
     }
 }

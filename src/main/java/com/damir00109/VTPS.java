@@ -4,16 +4,19 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import com.mojang.brigadier.CommandDispatcher;
+import com.damir00109.ActionBar;
+import com.damir00109.BossBarTPS;
 
 import static net.minecraft.server.command.CommandManager.literal;
 
-public class VanillaTPS {
+public class VTPS {
 	public static final String MOD_ID = "vanilla-tps";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -124,6 +127,53 @@ public class VanillaTPS {
 	 * Метод для регистрации команд.
 	 */
 	public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
+		// /vtps info
+		dispatcher.register(
+				literal("vtps")
+						.requires(source -> source.hasPermissionLevel(2))
+						.then(literal("info")
+								.executes(ctx -> {
+									ServerPlayerEntity player = ctx.getSource().getPlayer();
+									if (player != null) {
+										player.sendMessage(Text.literal("Автор мода: ").append(Text.literal("damir00109").formatted(Formatting.GOLD)));
+										player.sendMessage(Text.literal("Спасибо за использование мода!").formatted(Formatting.GREEN));
+									}
+									return 1;
+								})
+						)
+		);
+
+		// /vtps actionbar
+		dispatcher.register(
+				literal("vtps")
+						.requires(source -> source.hasPermissionLevel(2))
+						.then(literal("actionbar")
+								.executes(context -> {
+									ServerPlayerEntity player = context.getSource().getPlayer();
+									if (player != null) {
+										ActionBar.toggleActionBar(player);
+									}
+									return 1;
+								})
+						)
+		);
+		// /vtps bossbar
+		dispatcher.register(
+				literal("vtps")
+						.requires(source -> source.hasPermissionLevel(2))
+						.then(literal("bossbar")
+								.executes(context -> {
+									ServerPlayerEntity player = context.getSource().getPlayer();
+									if (player != null) {
+										BossBarTPS.toggleBossBar(player);
+									}
+									return 1;
+								})
+						)
+		);
+
+
+
 		// Команда /tps
 		dispatcher.register(
 				literal("tps")
@@ -139,6 +189,7 @@ public class VanillaTPS {
 				literal("tps-actionbar")
 						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
 						.executes(context -> {
+							context.getSource().sendFeedback(() -> Text.literal("Команда /tps-actionbar ").append(Text.literal("устарела").formatted(Formatting.YELLOW)).append(Text.literal(". Используйте /vtps actionbar")), true);
 							ServerPlayerEntity player = context.getSource().getPlayer();
 							if (player != null) {
 								ActionBar.toggleActionBar(player);
@@ -152,6 +203,7 @@ public class VanillaTPS {
 				literal("tabtps")
 						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
 						.executes(context -> {
+							context.getSource().sendFeedback(() -> Text.literal("Команда /tabtps ").append(Text.literal("устарела").formatted(Formatting.YELLOW)).append(Text.literal(". Используйте /vtps bossbar")), true);
 							ServerPlayerEntity player = context.getSource().getPlayer();
 							if (player != null) {
 								BossBarTPS.toggleBossBar(player);

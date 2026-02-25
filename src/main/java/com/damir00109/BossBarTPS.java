@@ -74,8 +74,8 @@ public class BossBarTPS {
         ServerBossBar bossBar = playerBossBars.get(player.getUuid());
         if (bossBar == null) return;
 
-        double tps = VanillaTPS.getCurrentTPS();
-        double mspt = VanillaTPS.getCurrentMSPT();
+        double tps = VTPS.getCurrentTPS();
+        double mspt = VTPS.getCurrentMSPT();
         int ping = player.networkHandler.getLatency(); // Пинг игрока
 
         // Формируем текст для Boss Bar

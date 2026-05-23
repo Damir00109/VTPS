@@ -117,21 +117,10 @@ public class VTPS implements ModInitializer {
 		);
 	}
 
-	private static boolean isOp(CommandSourceStack source) {
-		ServerPlayer player = source.getPlayer();
-		if (player == null) return false;
-
-		// Используем прямой вызов как в оригинальном коде Minecraft
-		return source.getServer()
-				.getPlayerList()
-				.isOp(player.nameAndId());
-	}
-
 	public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
 		// /vtps info
 		dispatcher.register(
 				literal("vtps")
-						.requires(VTPS::isOp)
 						.then(literal("info")
 								.executes(ctx -> {
 									ServerPlayer player = ctx.getSource().getPlayer();
@@ -147,7 +136,6 @@ public class VTPS implements ModInitializer {
 		// /vtps actionbar
 		dispatcher.register(
 				literal("vtps")
-						.requires(VTPS::isOp)
 						.then(literal("actionbar")
 								.executes(ctx -> {
 									ServerPlayer p = ctx.getSource().getPlayer();
@@ -160,7 +148,6 @@ public class VTPS implements ModInitializer {
 		// /vtps bossbar
 		dispatcher.register(
 				literal("vtps")
-						.requires(VTPS::isOp)
 						.then(literal("bossbar")
 								.executes(ctx -> {
 									ServerPlayer p = ctx.getSource().getPlayer();
@@ -173,7 +160,6 @@ public class VTPS implements ModInitializer {
 		// /tps - с локализацией
 		dispatcher.register(
 				literal("tps")
-						.requires(VTPS::isOp)
 						.executes(ctx -> {
 							ServerPlayer player = ctx.getSource().getPlayer();
 							if (player != null) {
@@ -188,7 +174,6 @@ public class VTPS implements ModInitializer {
 		// /tps-actionbar - устаревшая команда
 		dispatcher.register(
 				literal("tps-actionbar")
-						.requires(VTPS::isOp)
 						.executes(ctx -> {
 							ctx.getSource().sendSystemMessage(Component.literal("Команда /tps-actionbar ").append(Component.literal("устарела").withStyle(ChatFormatting.YELLOW)).append(Component.literal(". Используйте /vtps actionbar")));
 							ServerPlayer p = ctx.getSource().getPlayer();
@@ -200,7 +185,6 @@ public class VTPS implements ModInitializer {
 		// /tabtps - устаревшая команда
 		dispatcher.register(
 				literal("tabtps")
-						.requires(VTPS::isOp)
 						.executes(ctx -> {
 							ctx.getSource().sendSystemMessage(Component.literal("Команда /tabtps ").append(Component.literal("устарела").withStyle(ChatFormatting.YELLOW)).append(Component.literal(". Используйте /vtps bossbar")));
 							ServerPlayer p = ctx.getSource().getPlayer();

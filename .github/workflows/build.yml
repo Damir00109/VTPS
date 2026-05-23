@@ -20,11 +20,15 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Extract mod version
+      - name: Extract versions and commit message
         id: version
         run: |
           MOD_VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d "'\" ")
+          MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2 | tr -d "'\" ")
+          COMMIT_MSG=$(git log -1 --pretty=%s | sed 's/"/\\\\u0022/g')
           echo "MOD_VERSION=${MOD_VERSION}" >> $GITHUB_OUTPUT
+          echo "MC_VERSION=${MC_VERSION}" >> $GITHUB_OUTPUT
+          echo "COMMIT_MSG=${COMMIT_MSG}" >> $GITHUB_OUTPUT
 
       - name: Find existing tags and calculate release number
         id: tags
@@ -59,6 +63,12 @@ jobs:
       - name: Build mod
         run: ./gradlew build
 
+      - name: Find built jar
+        id: jar
+        run: |
+          JAR_PATH=$(ls build/libs/*.jar | grep -v '\-dev\.jar' | head -1)
+          echo "JAR_PATH=${JAR_PATH}" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -67,3 +77,29 @@ jobs:
           files: build/libs/*[!-dev].jar
           draft: false
           generate_release_notes: true
+
+      - name: Publish to Modrinth
+        run: |
+          JAR_PATH="${{ steps.jar.outputs.JAR_PATH }}"
+          JAR_NAME=$(basename "$JAR_PATH")
+          HTTP_STATUS=$(curl --fail -s -o response.json -w "%{http_code}" \
+            -X POST "https://api.modrinth.com/v2/version" \
+            -H "Authorization: ${{ secrets.MODRINTH_TOKEN }}" \
+            -F "data={\
+              \"name\": \"Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }}\",\
+              \"version_number\": \"${{ steps.version.outputs.MOD_VERSION }}\",\
+              \"changelog\": \"${{ steps.version.outputs.COMMIT_MSG }}\",\
+              \"dependencies\": [],\
+              \"game_versions\": [\"${{ steps.version.outputs.MC_VERSION }}\"],\
+              \"version_type\": \"release\",\
+              \"loaders\": [\"fabric\"],\
+              \"featured\": true,\
+              \"status\": \"listed\",\
+              \"project_id\": \"OgsODby2\",\
+              \"file_parts\": [\"file\"],\
+              \"primary_file\": \"file\"\
+            };type=application/json" \
+            -F "file=@${JAR_PATH};filename=${JAR_NAME};type=application/java-archive")
+          echo "Modrinth response: $HTTP_STATUS"
+          cat response.json
+          [ "$HTTP_STATUS" = "200" ] || exit 1

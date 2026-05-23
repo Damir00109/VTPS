@@ -130,7 +130,6 @@ public class VTPS {
 		// /vtps info
 		dispatcher.register(
 				literal("vtps")
-						.requires(source -> source.hasPermissionLevel(2))
 						.then(literal("info")
 								.executes(ctx -> {
 									ServerPlayerEntity player = ctx.getSource().getPlayer();
@@ -146,7 +145,6 @@ public class VTPS {
 		// /vtps actionbar
 		dispatcher.register(
 				literal("vtps")
-						.requires(source -> source.hasPermissionLevel(2))
 						.then(literal("actionbar")
 								.executes(context -> {
 									ServerPlayerEntity player = context.getSource().getPlayer();
@@ -160,7 +158,6 @@ public class VTPS {
 		// /vtps bossbar
 		dispatcher.register(
 				literal("vtps")
-						.requires(source -> source.hasPermissionLevel(2))
 						.then(literal("bossbar")
 								.executes(context -> {
 									ServerPlayerEntity player = context.getSource().getPlayer();
@@ -177,7 +174,6 @@ public class VTPS {
 		// Команда /tps
 		dispatcher.register(
 				literal("tps")
-						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
 						.executes(context -> {
 							context.getSource().sendMessage(Text.of(TPS.getTpsInfo()));
 							return 1;
@@ -187,7 +183,6 @@ public class VTPS {
 		// Команда /tps-actionbar
 		dispatcher.register(
 				literal("tps-actionbar")
-						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
 						.executes(context -> {
 							context.getSource().sendFeedback(() -> Text.literal("Команда /tps-actionbar ").append(Text.literal("устарела").formatted(Formatting.YELLOW)).append(Text.literal(". Используйте /vtps actionbar")), true);
 							ServerPlayerEntity player = context.getSource().getPlayer();
@@ -201,7 +196,6 @@ public class VTPS {
 		// Команда /tabtps
 		dispatcher.register(
 				literal("tabtps")
-						.requires(source -> source.hasPermissionLevel(2)) // Требует уровня доступа 2 (оператор)
 						.executes(context -> {
 							context.getSource().sendFeedback(() -> Text.literal("Команда /tabtps ").append(Text.literal("устарела").formatted(Formatting.YELLOW)).append(Text.literal(". Используйте /vtps bossbar")), true);
 							ServerPlayerEntity player = context.getSource().getPlayer();

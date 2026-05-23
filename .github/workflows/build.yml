@@ -30,7 +30,9 @@ jobs:
 
       - name: Get commit message
         id: commit
-        run: echo "COMMIT_MSG=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+          echo "COMMIT_MSG=${COMMIT_MSG}" >> $GITHUB_OUTPUT
 
       - name: Find existing tags and calculate release number
         id: tags
@@ -65,6 +67,12 @@ jobs:
       - name: Build mod
         run: ./gradlew build
 
+      - name: Find built jar
+        id: jar
+        run: |
+          JAR_PATH=$(ls build/libs/*.jar | grep -v '\-dev\.jar' | head -1)
+          echo "JAR_PATH=${JAR_PATH}" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
@@ -75,13 +83,24 @@ jobs:
           generate_release_notes: true
 
       - name: Publish to Modrinth
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-id: vtps
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          modrinth-version: "${{ steps.version.outputs.MOD_VERSION }}"
-          modrinth-version-type: release
-          modrinth-game-versions: "${{ steps.version.outputs.MC_VERSION }}"
-          modrinth-loaders: fabric
-          modrinth-changelog: "${{ steps.commit.outputs.COMMIT_MSG }}"
-          files: build/libs/!(*-@(dev|sources|javadoc)).jar
+        run: |
+          JAR_PATH="${{ steps.jar.outputs.JAR_PATH }}"
+          JAR_NAME=$(basename "$JAR_PATH")
+          curl --fail -s -o /dev/null -w "%{http_code}" \
+            -X POST "https://api.modrinth.com/v2/version" \
+            -H "Authorization: ${{ secrets.MODRINTH_TOKEN }}" \
+            -F "data={
+              \"name\": \"Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }}\",
+              \"version_number\": \"${{ steps.version.outputs.MOD_VERSION }}\",
+              \"changelog\": \"${{ steps.commit.outputs.COMMIT_MSG }}\",
+              \"dependencies\": [],
+              \"game_versions\": [\"${{ steps.version.outputs.MC_VERSION }}\"],
+              \"version_type\": \"release\",
+              \"loaders\": [\"fabric\"],
+              \"featured\": true,
+              \"status\": \"listed\",
+              \"project_id\": \"OgsODby2\",
+              \"file_parts\": [\"file\"],
+              \"primary_file\": \"file\"
+            };type=application/json" \
+            -F "file=@${JAR_PATH};filename=${JAR_NAME};type=application/java-archive"

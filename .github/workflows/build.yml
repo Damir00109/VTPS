@@ -20,14 +20,12 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Extract versions and commit message
+      - name: Extract mod version and commit message
         id: version
         run: |
           MOD_VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d "'\" ")
-          MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2 | tr -d "'\" ")
           COMMIT_MSG=$(git log -1 --pretty=%s | sed 's/"/\\\\u0022/g')
           echo "MOD_VERSION=${MOD_VERSION}" >> $GITHUB_OUTPUT
-          echo "MC_VERSION=${MC_VERSION}" >> $GITHUB_OUTPUT
           echo "COMMIT_MSG=${COMMIT_MSG}" >> $GITHUB_OUTPUT
 
       - name: Find existing tags and calculate release number
@@ -90,7 +88,7 @@ jobs:
               \"version_number\": \"${{ steps.version.outputs.MOD_VERSION }}\",\
               \"changelog\": \"${{ steps.version.outputs.COMMIT_MSG }}\",\
               \"dependencies\": [],\
-              \"game_versions\": [\"${{ steps.version.outputs.MC_VERSION }}\"],\
+              \"game_versions\": [\"1.20.2\",\"1.20.3\",\"1.20.4\",\"1.20.5\",\"1.20.6\",\"1.21\",\"1.21.1\",\"1.21.2\",\"1.21.3\",\"1.21.4\",\"1.21.5\",\"1.21.6\",\"1.21.7\",\"1.21.8\",\"1.21.9\",\"1.21.10\"],\
               \"version_type\": \"release\",\
               \"loaders\": [\"fabric\"],\
               \"featured\": true,\

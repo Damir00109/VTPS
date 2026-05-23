@@ -20,11 +20,17 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Extract mod version
+      - name: Extract mod version and minecraft version
         id: version
         run: |
           MOD_VERSION=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d "'\" ")
+          MC_VERSION=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2 | tr -d "'\" ")
           echo "MOD_VERSION=${MOD_VERSION}" >> $GITHUB_OUTPUT
+          echo "MC_VERSION=${MC_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Get commit message
+        id: commit
+        run: echo "COMMIT_MSG=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
 
       - name: Find existing tags and calculate release number
         id: tags
@@ -67,3 +73,15 @@ jobs:
           files: build/libs/*[!-dev].jar
           draft: false
           generate_release_notes: true
+
+      - name: Publish to Modrinth
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: vtps
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-version: "${{ steps.version.outputs.MOD_VERSION }}"
+          modrinth-version-type: release
+          modrinth-game-versions: "${{ steps.version.outputs.MC_VERSION }}"
+          modrinth-loaders: fabric
+          modrinth-changelog: "${{ steps.commit.outputs.COMMIT_MSG }}"
+          files: build/libs/!(*-@(dev|sources|javadoc)).jar

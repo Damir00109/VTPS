@@ -10,7 +10,7 @@ import com.damir00109.VTPS;
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
 
-    @Inject(method = "tick", at = @At("TAIL"))
+    @Inject(method = "tickServer", at = @At("TAIL"))
     private void onServerTick(CallbackInfo ci) {
         // Вызываем метод из основного класса
         VTPS.onServerTick((MinecraftServer) (Object) this);

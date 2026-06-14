@@ -1,10 +1,10 @@
 package com.damir00109;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.lang.management.ManagementFactory;
@@ -14,7 +14,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.damir00109.ActionBar;
 import com.damir00109.BossBarTPS;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class VTPS {
 	public static final String MOD_ID = "vanilla-tps";
@@ -126,16 +126,16 @@ public class VTPS {
 	/**
 	 * Метод для регистрации команд.
 	 */
-	public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
+	public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher) {
 		// /vtps info
 		dispatcher.register(
 				literal("vtps")
 						.then(literal("info")
 								.executes(ctx -> {
-									ServerPlayerEntity player = ctx.getSource().getPlayer();
+									ServerPlayer player = ctx.getSource().getPlayer();
 									if (player != null) {
-										player.sendMessage(Text.literal("Автор мода: ").append(Text.literal("damir00109").formatted(Formatting.GOLD)));
-										player.sendMessage(Text.literal("Спасибо за использование мода!").formatted(Formatting.GREEN));
+										player.sendSystemMessage(Component.literal("Автор мода: ").append(Component.literal("damir00109").withStyle(ChatFormatting.GOLD)));
+										player.sendSystemMessage(Component.literal("Спасибо за использование мода!").withStyle(ChatFormatting.GREEN));
 									}
 									return 1;
 								})
@@ -147,7 +147,7 @@ public class VTPS {
 				literal("vtps")
 						.then(literal("actionbar")
 								.executes(context -> {
-									ServerPlayerEntity player = context.getSource().getPlayer();
+									ServerPlayer player = context.getSource().getPlayer();
 									if (player != null) {
 										ActionBar.toggleActionBar(player);
 									}
@@ -160,7 +160,7 @@ public class VTPS {
 				literal("vtps")
 						.then(literal("bossbar")
 								.executes(context -> {
-									ServerPlayerEntity player = context.getSource().getPlayer();
+									ServerPlayer player = context.getSource().getPlayer();
 									if (player != null) {
 										BossBarTPS.toggleBossBar(player);
 									}
@@ -175,7 +175,7 @@ public class VTPS {
 		dispatcher.register(
 				literal("tps")
 						.executes(context -> {
-							context.getSource().sendMessage(Text.of(TPS.getTpsInfo()));
+							context.getSource().sendSystemMessage(Component.nullToEmpty(TPS.getTpsInfo()));
 							return 1;
 						})
 		);
@@ -184,8 +184,8 @@ public class VTPS {
 		dispatcher.register(
 				literal("tps-actionbar")
 						.executes(context -> {
-							context.getSource().sendFeedback(() -> Text.literal("Команда /tps-actionbar ").append(Text.literal("устарела").formatted(Formatting.YELLOW)).append(Text.literal(". Используйте /vtps actionbar")), true);
-							ServerPlayerEntity player = context.getSource().getPlayer();
+							context.getSource().sendSuccess(() -> Component.literal("Команда /tps-actionbar ").append(Component.literal("устарела").withStyle(ChatFormatting.YELLOW)).append(Component.literal(". Используйте /vtps actionbar")), true);
+							ServerPlayer player = context.getSource().getPlayer();
 							if (player != null) {
 								ActionBar.toggleActionBar(player);
 							}
@@ -197,8 +197,8 @@ public class VTPS {
 		dispatcher.register(
 				literal("tabtps")
 						.executes(context -> {
-							context.getSource().sendFeedback(() -> Text.literal("Команда /tabtps ").append(Text.literal("устарела").formatted(Formatting.YELLOW)).append(Text.literal(". Используйте /vtps bossbar")), true);
-							ServerPlayerEntity player = context.getSource().getPlayer();
+							context.getSource().sendSuccess(() -> Component.literal("Команда /tabtps ").append(Component.literal("устарела").withStyle(ChatFormatting.YELLOW)).append(Component.literal(". Используйте /vtps bossbar")), true);
+							ServerPlayer player = context.getSource().getPlayer();
 							if (player != null) {
 								BossBarTPS.toggleBossBar(player);
 							}

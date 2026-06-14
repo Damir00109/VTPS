@@ -7,6 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
+import com.damir00109.PingUtil;
 
 public class BossBarTPS {
     private static final Map<UUID, ServerBossEvent> playerBossBars = new HashMap<>();
@@ -76,7 +77,7 @@ public class BossBarTPS {
 
         double tps = VTPS.getCurrentTPS();
         double mspt = VTPS.getCurrentMSPT();
-        int ping = player.connection.latency(); // Пинг игрока
+        int ping = PingUtil.getPing(player); // Пинг игрока (универсально для разных версий)
 
         // Формируем текст для Boss Bar
         String message = String.format("TPS: %.2f, MSPT: %.2fms, Ping: %dms", tps, mspt, ping);

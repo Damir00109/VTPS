@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import com.damir00109.PingUtil;
 
 public class ActionBar {
     private static final Map<UUID, Boolean> playerActionBarStates = new HashMap<>();
@@ -64,7 +65,7 @@ public class ActionBar {
     public static void updateActionBar(ServerPlayer player) {
         double tps = VTPS.getCurrentTPS();
         double mspt = VTPS.getCurrentMSPT();
-        int ping = player.connection.latency(); // Пинг игрока
+        int ping = PingUtil.getPing(player); // Пинг игрока (универсально для разных версий)
 
         // Формируем текст для Action Bar
         String message = String.format("TPS: %.2f, MSPT: %.2fms, Ping: %dms", tps, mspt, ping);

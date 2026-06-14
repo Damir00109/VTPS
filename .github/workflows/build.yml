@@ -83,7 +83,7 @@ jobs:
           JAR_PATH="${{ steps.jar.outputs.JAR_PATH }}"
           JAR_NAME=$(basename "$JAR_PATH")
           HTTP_STATUS=$(curl --fail -s -o response.json -w "%{http_code}" \
-            -X POST "https://modrinth.com" \
+            -X POST "https://api.modrinth.com/v2/version" \
             -H "Authorization: ${{ secrets.MODRINTH_TOKEN }}" \
             -F "data={\
               \"name\": \"Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }}\",\

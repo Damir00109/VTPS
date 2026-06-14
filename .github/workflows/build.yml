@@ -72,7 +72,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: "${{ steps.tags.outputs.RELEASE_TAG }}"
-          name: "Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }} Minecraft: 1.20.2-1.21.10"
+          name: "Vanilla+ TPS ${{ steps.version.outputs.MOD_VERSION }} Minecraft: 1.20-1.20.1"
           # Передаем точный путь к JAR вместо ненадёжной маски
           files: ${{ steps.jar.outputs.JAR_PATH }}
           draft: false
